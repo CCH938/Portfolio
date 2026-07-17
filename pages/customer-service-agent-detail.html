@@ -484,11 +484,11 @@
     </svg>
   </div>
   <h1>智能客服 Agent</h1>
-  <p class="subtitle">基于大语言模型的多轮对话智能客服系统，集成 RAG 知识库检索、意图识别与情感分析，支持企业微信、钉钉等多平台接入，实现 7×24 小时自动客服。</p>
+  <p class="subtitle">基于大语言模型的多轮对话智能客服系统，集成 RAG 知识库检索、意图识别与情感分析，通过 Web Chat 提供 7×24 小时自动客服体验。</p>
   <div class="hero-badges">
     <span class="hero-badge">LLM 驱动</span>
     <span class="hero-badge accent2">RAG 检索</span>
-    <span class="hero-badge">多平台接入</span>
+    <span class="hero-badge">Web Chat</span>
     <span class="hero-badge accent2">7×24 在线</span>
   </div>
 </section>
@@ -497,9 +497,9 @@
 <section class="section container">
   <h2 class="section-title reveal">产品概述</h2>
   <div class="card reveal">
-    <p style="max-width:900px">本系统是一套面向企业级场景的智能客服解决方案。以 DeepSeek / GPT-4o-mini 等大语言模型为核心引擎，结合向量检索（RAG）实现精准知识问答，辅以意图识别和情感分析模块，能够理解用户真实意图、感知情绪变化，提供自然流畅的多轮对话体验。</p>
+    <p style="max-width:900px">本系统是一套面向企业级场景的智能客服解决方案。以 DeepSeek / GPT-4o-mini 等大语言模型为核心引擎，结合 Chroma 向量检索（RAG）实现精准知识问答，辅以意图识别（6种）、情感分析（5级）和安全护栏模块，能够理解用户真实意图、感知情绪变化，提供自然流畅的多轮对话体验。</p>
     <br>
-    <p style="max-width:900px;color:var(--text-secondary)">适用场景涵盖：售后咨询（退换货、物流、保修）、产品使用指导、业务办理引导、内部 IT 服务台等。通过统一的 Message Router 可无缝接入企业微信、钉钉、Web Chat 等渠道。</p>
+    <p style="max-width:900px;color:var(--text-secondary)">适用场景涵盖：售后咨询（退换货、物流、保修）、产品使用指导、业务办理引导、内部 IT 服务台等。通过 Web Chat 提供即时客服体验，后续将扩展企业微信、钉钉等 IM 平台接入。</p>
   </div>
 </section>
 
@@ -569,28 +569,28 @@
   <h2 class="section-title reveal">核心能力</h2>
   <div class="card-grid">
     <div class="card reveal">
-      <h3><span class="card-icon">🧠</span> 意图识别引擎</h3>
-      <p>基于 LLM 的 Few-shot 意图分类，支持 20+ 业务意图的精准识别。结合置信度阈值与降级策略，低置信度场景自动转人工或引导用户澄清，保障对话质量。</p>
+      <h3><span class="card-icon">🧠</span> 意图识别引擎 <span style="font-size:0.7rem;background:#ecfdf5;color:#10b981;padding:2px 8px;border-radius:100px;font-weight:600">✅ 已实现</span></h3>
+      <p>支持 <strong>6 种业务意图</strong>（order_query / refund / product_consult / account_service / human_transfer / chitchat），基于 LLM Few-shot 分类 + 置信度阈值过滤，低分结果自动兜底为澄清追问或转人工。</p>
     </div>
     <div class="card reveal">
-      <h3><span class="card-icon">📚</span> RAG 知识检索</h3>
-      <p>Embedding + 向量相似度搜索，从 FAQ / 产品手册中精准召回相关知识片段，与 LLM 生成结合输出有据可依的答案。支持关键词 + 语义双路召回，提升命中率。</p>
+      <h3><span class="card-icon">📚</span> RAG 知识检索 <span style="font-size:0.7rem;background:#ecfdf5;color:#10b981;padding:2px 8px;border-radius:100px;font-weight:600">✅ 已实现</span></h3>
+      <p>基于 <strong>Chroma 向量数据库</strong> + 关键词双路召回，覆盖 <strong>12 条 FAQ</strong>。语义相似度 &lt; 0.6 时自动降级为通用回复，确保答案有据可依、减少幻觉。</p>
     </div>
     <div class="card reveal">
-      <h3><span class="card-icon">💬</span> 多轮对话记忆</h3>
-      <p>会话级上下文管理，基于 TTL 的滑动窗口记忆机制。自动维护最近的 N 轮对话历史，支持跨轮指代消解和上下文连贯回复。</p>
+      <h3><span class="card-icon">💬</span> 多轮对话记忆 <span style="font-size:0.7rem;background:#ecfdf5;color:#10b981;padding:2px 8px;border-radius:100px;font-weight:600">✅ 已实现</span></h3>
+      <p><strong>SQLite 持久化</strong>存储会话历史，<strong>滑动窗口 20 轮</strong>，超出自动触发摘要压缩。跨轮上下文连贯，支持指代消解与多话题切换。</p>
     </div>
     <div class="card reveal">
-      <h3><span class="card-icon">❤️</span> 情感分析</h3>
-      <p>实时识别用户情绪（正面 / 中性 / 负面），当检测到强烈不满或投诉倾向时，自动触发安抚策略并优先转接人工坐席，避免舆情升级。</p>
+      <h3><span class="card-icon">❤️</span> 情感分析 <span style="font-size:0.7rem;background:#ecfdf5;color:#10b981;padding:2px 8px;border-radius:100px;font-weight:600">✅ 已实现</span></h3>
+      <p><strong>5 级情感标签</strong>（非常满意 / 满意 / 中性 / 不满 / 愤怒），<strong>连续 3 轮</strong>负面情绪自动触发安抚策略并升级转人工，有效防止舆情恶化。</p>
     </div>
     <div class="card reveal">
-      <h3><span class="card-icon">🛡️</span> 安全护栏</h3>
-      <p>多层安全防护：Prompt 注入检测、PII 敏感信息脱敏、输出内容过滤、敏感词拦截。确保系统不被恶意利用，保障用户隐私与合规性。</p>
+      <h3><span class="card-icon">🛡️</span> 安全护栏 <span style="font-size:0.7rem;background:#ecfdf5;color:#10b981;padding:2px 8px;border-radius:100px;font-weight:600">✅ 已实现</span></h3>
+      <p><strong>14 条注入检测规则</strong> + 越狱拦截，覆盖 Prompt Injection / DAN / 角色扮演等攻击手法。<strong>PII 脱敏</strong>自动屏蔽手机号与身份证号，输出过滤敏感词，保障合规。</p>
     </div>
     <div class="card reveal">
-      <h3><span class="card-icon">🔌</span> 多平台接入</h3>
-      <p>统一的 Message Router 抽象层，通过 Adapter 模式接入企业微信、钉钉、Web Chat、API 等多种渠道。消息格式统一转换，业务逻辑零耦合。</p>
+      <h3><span class="card-icon">🔌</span> 多平台接入 <span style="font-size:0.7rem;background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:100px;font-weight:600">🚧 规划中</span></h3>
+      <p>目前仅提供 <strong>Web Chat</strong> 界面。企业微信、钉钉等 IM 平台 Adapter 已完成架构设计，Message Router 抽象层已预留扩展接口，将在后续版本实现。</p>
     </div>
   </div>
 </section>
@@ -604,16 +604,17 @@
       <span class="tag">FastAPI / aiohttp</span>
       <span class="tag">LangChain</span>
       <span class="tag">DeepSeek / GPT-4o-mini</span>
+      <span class="tag">Chroma</span>
+      <span class="tag">SQLite</span>
       <span class="tag">PostgreSQL</span>
       <span class="tag">Redis</span>
-      <span class="tag">Milvus</span>
       <span class="tag">Docker</span>
       <span class="tag">Kubernetes</span>
       <span class="tag">Pydantic</span>
       <span class="tag">Sentence-Transformers</span>
       <span class="tag">Prometheus + Grafana</span>
     </div>
-    <p style="color:var(--text-secondary);font-size:0.9rem">LLM 网关支持 OpenAI 兼容 API，可灵活切换 DeepSeek / GPT-4o-mini / 本地模型。知识库 Embedding 采用 Sentence-Transformers，向量检索基于 Milvus。会话状态与缓存通过 Redis 管理，持久化数据存储于 PostgreSQL。</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem">LLM 网关支持 OpenAI 兼容 API，可灵活切换 DeepSeek / GPT-4o-mini / 本地模型。知识库 Embedding 采用 Sentence-Transformers，向量检索基于 Chroma。会话状态与缓存通过 Redis 管理，对话历史持久化于 SQLite，业务数据存储于 PostgreSQL。</p>
   </div>
 </section>
 
@@ -628,13 +629,16 @@
           <span class="phase-label">Phase 1</span>
         </div>
         <div class="phase-content">
-          <h4>基础搭建 · 2 周 ✅</h4>
+          <h4>基础搭建 · 2 周 ✅ 已完成</h4>
           <ul>
             <li>项目脚手架（FastAPI + Docker）</li>
-            <li>LLM 接入层（GPT-4o-mini）</li>
-            <li>基础对话 API（/chat/send）</li>
-            <li>PostgreSQL 建表 + 会话存储</li>
-            <li>简单 FAQ 知识库（8 条）</li>
+            <li>LLM 接入层（DeepSeek / GPT-4o-mini）</li>
+            <li>基础对话 API + Web Chat 前端</li>
+            <li>SQLite 会话持久化 + 滑动窗口记忆</li>
+            <li>Chroma 向量库 + 12 条 FAQ 知识库</li>
+            <li>6 种意图识别 + 置信度过滤</li>
+            <li>5 级情感分析 + 负面升级机制</li>
+            <li>14 条安全注入检测 + PII 脱敏</li>
           </ul>
         </div>
       </div>
@@ -644,13 +648,13 @@
           <span class="phase-label">Phase 2</span>
         </div>
         <div class="phase-content">
-          <h4>核心能力 · 3 周 🔄</h4>
+          <h4>能力增强 · 2 周 🔄 进行中</h4>
           <ul>
-            <li>RAG 检索 Pipeline</li>
-            <li>意图识别引擎（20+ 意图）</li>
-            <li>多轮对话记忆管理</li>
-            <li>情感分析模块</li>
-            <li>安全护栏（Guardrails）</li>
+            <li>意图扩展至 20+ 业务场景</li>
+            <li>知识库扩充 + 混合检索调优</li>
+            <li>多轮记忆摘要压缩算法优化</li>
+            <li>情感分析模型微调与 A/B 测试</li>
+            <li>运营后台（知识管理 + 数据看板）</li>
           </ul>
         </div>
       </div>
@@ -662,10 +666,10 @@
         <div class="phase-content">
           <h4>平台接入 · 2 周</h4>
           <ul>
+            <li>✅ Web Chat 前端（已实现）</li>
             <li>企业微信 Adapter</li>
             <li>钉钉 Adapter</li>
-            <li>Web Chat 前端</li>
-            <li>消息统一路由</li>
+            <li>消息统一路由（已预留接口）</li>
           </ul>
         </div>
       </div>
@@ -708,7 +712,7 @@
 <section class="section container">
   <h2 class="section-title reveal">快速启动</h2>
   <div class="card reveal">
-    <p style="margin-bottom:12px;color:var(--text-secondary)">Phase 1 已完成，可直接运行体验。需要 Python 3.10+ 和 DeepSeek API Key。</p>
+    <p style="margin-bottom:12px;color:var(--text-secondary)">核心功能已全部实现，可直接运行体验。需要 Python 3.10+ 和 DeepSeek API Key（或其他 OpenAI 兼容 API）。</p>
     <div class="code-block">
 <span class="comment"># 1. 进入项目目录</span>
 <span class="cmd">cd</span> customer-service-agent
@@ -726,7 +730,7 @@
 <span class="comment"># http://localhost:8000 → 网页聊天界面</span>
     </div>
     <br>
-    <p style="color:var(--text-muted);font-size:0.85rem">📁 项目结构：app/api/（路由）、app/core/（LLM / 记忆 / 护栏 / 知识库）、app/models/（数据模型）、static/（Web 界面）、knowledge/（FAQ 文件）</p>
+    <p style="color:var(--text-muted);font-size:0.85rem">📁 项目结构：app/api/（路由）、app/core/（LLM / 意图 / 记忆 / 情感 / 护栏 / 知识库）、app/models/（数据模型）、app/db/（SQLite + Chroma）、static/（Web 界面）、knowledge/（FAQ 文件）</p>
   </div>
 </section>
 
