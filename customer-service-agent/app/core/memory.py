@@ -1,96 +1,68 @@
-﻿"""Conversation memory manager — in-memory implementation."""
+﻿"""Conversation memory manager — SQLite-backed with auto-summarization."""
 
 from __future__ import annotations
-import json
 import uuid
-from datetime import datetime
-from app.db.database import get_store
 from app.config import get_settings
 from app.core.llm import _build_llm
+from app.db import database as db
 from langchain_core.messages import HumanMessage
 
 settings = get_settings()
 
 
 class ConversationMemory:
-    """Manages conversation state for a single session (in-memory)."""
+    """Manages conversation state for a single session (SQLite)."""
 
-    def __init__(self, session_id: str, user_id: str):
-        self.store = get_store()
+    def __init__(self, session_id: str, user_id: str = ""):
         self.session_id = session_id
         self.user_id = user_id
 
     @classmethod
     async def create(cls, user_id: str) -> "ConversationMemory":
         session_id = str(uuid.uuid4())
-        memory = cls(session_id, user_id)
-        memory._init_session()
-        return memory
+        db.create_session(session_id, user_id)
+        return cls(session_id, user_id)
 
     @classmethod
     async def load(cls, session_id: str) -> "ConversationMemory | None":
-        store = get_store()
-        if not store.exists(f"session:{session_id}"):
+        if not db.session_exists(session_id):
             return None
-        return cls(session_id, "")
+        return cls(session_id)
 
-    def _init_session(self):
-        self.store.set(f"session:{self.session_id}", {
-            "user_id": self.user_id,
-            "created_at": datetime.utcnow().isoformat(),
-            "turn_count": 0,
-            "sentiment_trend": [],
-            "summary": "",
-            "status": "active",
-        }, ttl=settings.session_ttl_seconds)
+    async def add_turn(self, role: str, content: str, intent: str = "", confidence: float = 0.0):
+        db.add_message_db(self.session_id, role, content, intent, confidence)
 
-    def _get_meta(self) -> dict:
-        return self.store.get(f"session:{self.session_id}") or {}
-
-    def _set_meta(self, data: dict):
-        self.store.set(f"session:{self.session_id}", data, ttl=settings.session_ttl_seconds)
-
-    def add_turn(self, role: str, content: str, intent: str = "", confidence: float = 0.0):
-        meta = self._get_meta()
-        turns = self.store.get(f"turns:{self.session_id}") or []
-        turns.append({
-            "role": role,
-            "content": content,
-            "intent": intent,
-            "confidence": confidence,
-        })
-        self.store.set(f"turns:{self.session_id}", turns, ttl=settings.session_ttl_seconds)
-        meta["turn_count"] = len(turns)
-        self._set_meta(meta)
-
-    def get_history(self, last_n: int | None = None) -> list[dict]:
+    async def get_history(self, last_n: int | None = None) -> list[dict]:
         n = last_n or settings.max_conversation_turns
-        turns = self.store.get(f"turns:{self.session_id}") or []
-        return turns[-n:]
+        return db.get_messages(self.session_id, n)
 
-    def update_sentiment_trend(self, sentiment_label: str):
-        meta = self._get_meta()
-        trend = meta.get("sentiment_trend", [])
+    async def update_sentiment_trend(self, sentiment_label: str):
+        trend = db.get_session_trend(self.session_id)
         trend.append(sentiment_label)
         if len(trend) > 6:
             trend = trend[-6:]
-        meta["sentiment_trend"] = trend
-        self._set_meta(meta)
+        db.update_session_trend(self.session_id, trend)
 
-    def is_escalating_negative(self) -> bool:
-        meta = self._get_meta()
-        trend = meta.get("sentiment_trend", [])
+    async def is_escalating_negative(self) -> bool:
+        trend = db.get_session_trend(self.session_id)
         if len(trend) >= 3:
             negatives = sum(1 for t in trend[-3:] if t in ("negative", "angry"))
             return negatives >= 3
         return False
 
-    def get_summary(self) -> str:
-        meta = self._get_meta()
-        return meta.get("summary", "")
+    async def get_summary(self) -> str:
+        return db.get_session_summary(self.session_id)
 
-    def close(self):
-        meta = self._get_meta()
-        meta["status"] = "closed"
-        meta["ended_at"] = datetime.utcnow().isoformat()
-        self._set_meta(meta)
+    async def summarize_and_compress(self):
+        history = await self.get_history()
+        if len(history) <= settings.summary_trigger_turns:
+            return
+        llm = _build_llm(temperature=0)
+        conv_text = "\n".join(f"{t['role']}: {t['content']}" for t in history)
+        response = await llm.ainvoke([
+            HumanMessage(content=f"请用一两句话总结以下对话的关键信息：\n{conv_text}")
+        ])
+        db.update_session_summary(self.session_id, response.content)
+
+    async def close(self):
+        db.close_session(self.session_id)

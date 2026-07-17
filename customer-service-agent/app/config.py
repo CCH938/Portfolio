@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.3
     llm_max_tokens: int = 2048
 
+    # Database
+    sqlite_path: str = "./data/agent.db"
+
+    # Vector Store
+    vector_store_type: str = "chroma"
+    chroma_persist_dir: str = "./data/chroma"
+
     # Conversation
     max_conversation_turns: int = 20
     summary_trigger_turns: int = 10

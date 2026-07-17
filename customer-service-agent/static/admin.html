@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识库管理 · 智能客服</title>
+<style>
+  :root { --bg:#f5f6fa; --card:#fff; --border:#e5e7ef; --text:#1e1e2e; --text-sec:#6b7280; --accent:#7c3aed; --green:#10b981; --red:#ef4444; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  .nav { background:var(--card); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:20px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .nav h2 { font-size:16px; }
+  .nav a { color:var(--text-sec); text-decoration:none; font-size:14px; }
+  .nav a:hover { color:var(--accent); }
+  .container { max-width:900px; margin:0 auto; padding:24px; }
+  .page-header { margin-bottom:24px; }
+  .page-header h1 { font-size:22px; font-weight:700; }
+  .page-header p { color:var(--text-sec); font-size:14px; margin-top:4px; }
+
+  .stats { display:flex; gap:16px; margin-bottom:24px; }
+  .stat-card { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 20px; }
+  .stat-card .label { font-size:12px; color:var(--text-sec); }
+  .stat-card .value { font-size:28px; font-weight:700; margin-top:4px; }
+
+  .form-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:24px; }
+  .form-card h3 { font-size:15px; margin-bottom:16px; }
+  .form-group { margin-bottom:14px; }
+  .form-group label { display:block; font-size:13px; font-weight:600; margin-bottom:4px; color:var(--text-sec); }
+  .form-group input, .form-group textarea, .form-group select {
+    width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:10px;
+    font-size:14px; font-family:inherit; outline:none; transition:border-color 0.15s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--accent); }
+  .form-group textarea { min-height:100px; resize:vertical; }
+  .btn {
+    padding:9px 20px; border-radius:10px; border:none; font-size:14px; font-weight:600;
+    cursor:pointer; transition:all 0.15s;
+  }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:#6d28d9; }
+  .btn-ghost { background:var(--card); color:var(--text-sec); border:1px solid var(--border); }
+
+  .item-list { display:flex; flex-direction:column; gap:8px; }
+  .item {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 18px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .item-category { font-size:11px; padding:3px 8px; border-radius:6px; background:#ede9fe; color:#7c3aed; white-space:nowrap; }
+  .item-title { font-weight:600; font-size:14px; flex:1; }
+  .item-preview { color:var(--text-sec); font-size:12px; }
+  .item-delete {
+    width:30px; height:30px; border-radius:8px; border:1px solid var(--border);
+    background:var(--card); color:var(--red); cursor:pointer; font-size:16px;
+    display:flex; align-items:center; justify-content:center; transition:0.15s;
+  }
+  .item-delete:hover { background:#fef2f2; border-color:var(--red); }
+
+  .toast { position:fixed; bottom:24px; right:24px; background:#1e1e2e; color:#fff; padding:12px 20px; border-radius:12px; font-size:14px; opacity:0; transition:opacity 0.3s; z-index:100; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <h2>⚙️ 智能客服 Agent</h2>
+  <a href="/">← 返回聊天</a>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>知识库管理</h1>
+    <p>管理 FAQ 条目，添加后立即生效，无需重启</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">知识条目</div>
+      <div class="value" id="statCount">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">反馈好评</div>
+      <div class="value" id="statFeedback">-</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h3>➕ 添加知识条目</h3>
+    <div class="form-group">
+      <label>标题（问题）</label>
+      <input id="newTitle" placeholder="如：如何查询订单状态？">
+    </div>
+    <div class="form-group">
+      <label>分类</label>
+      <select id="newCategory">
+        <option>订单查询</option><option>退款退货</option><option>支付方式</option>
+        <option>产品咨询</option><option>账户服务</option><option>常见问题</option>
+        <option>通用</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>内容（问题+答案）</label>
+      <textarea id="newContent" placeholder="问题的详细答案，可包含多条信息。例如：您可以在「我的订单」中输入订单号查询..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="addItem()">添加条目</button>
+  </div>
+
+  <h3 style="margin-bottom:12px;">📋 当前知识库</h3>
+  <div class="item-list" id="itemList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+async function loadItems() {
+  const resp = await fetch("/api/v1/admin/knowledge");
+  const data = await resp.json();
+  document.getElementById("statCount").textContent = data.total;
+  const list = document.getElementById("itemList");
+  list.innerHTML = data.items.map(i => `
+    <div class="item">
+      <span class="item-category">${i.category}</span>
+      <span class="item-title">${i.doc_title}</span>
+      <span class="item-preview">${i.content}</span>
+      <button class="item-delete" onclick="deleteItem('${i.chunk_id}')">×</button>
+    </div>
+  `).join("");
+}
+
+async function loadFeedback() {
+  const resp = await fetch("/api/v1/chat/health");
+  const data = await resp.json();
+  const fb = data.feedback;
+  document.getElementById("statFeedback").textContent = fb.up + " / " + fb.total;
+}
+
+async function addItem() {
+  const title = document.getElementById("newTitle").value.trim();
+  const content = document.getElementById("newContent").value.trim();
+  const category = document.getElementById("newCategory").value;
+  if (!title || !content) return showToast("请填写标题和内容");
+
+  await fetch("/api/v1/admin/knowledge", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({doc_title:title, content, category})
+  });
+  document.getElementById("newTitle").value = "";
+  document.getElementById("newContent").value = "";
+  showToast("已添加: " + title);
+  loadItems();
+}
+
+async function deleteItem(id) {
+  if (!confirm("确认删除？")) return;
+  await fetch("/api/v1/admin/knowledge/" + id, {method:"DELETE"});
+  showToast("已删除");
+  loadItems();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+loadItems();
+loadFeedback();
+</script>
+</body>
+</html>
