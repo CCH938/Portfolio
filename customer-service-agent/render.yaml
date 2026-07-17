@@ -1,0 +1,19 @@
+﻿services:
+  - type: web
+    name: cs-agent
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.main
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        value: https://api.deepseek.com/v1
+      - key: LLM_MODEL
+        value: deepseek-chat
+      - key: LLM_PROVIDER
+        value: deepseek
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "8000"

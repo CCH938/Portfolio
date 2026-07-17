@@ -1,0 +1,820 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Portfolio | 智能体作品集</title>
+<style>
+  /* ===== CSS Variables & Reset ===== */
+  :root {
+    --bg-deep: #ffffff;
+    --bg-surface: #f8f9fc;
+    --bg-card: #ffffff;
+    --border-subtle: rgba(0,0,0,0.08);
+    --border-glow: rgba(124,58,237,0.25);
+    --text-primary: #1a1a2e;
+    --text-secondary: #5c5c7a;
+    --text-muted: #8e8ea8;
+    --accent-primary: #7c3aed;
+    --accent-secondary: #06b6d4;
+    --accent-glow: rgba(124,58,237,0.08);
+    --gradient-hero: linear-gradient(135deg, #7c3aed 0%, #06b6d4 50%, #a855f7 100%);
+    --gradient-card: linear-gradient(135deg, rgba(124,58,237,0.04), rgba(6,182,212,0.04));
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    --font-mono: "SF Mono","Fira Code","Cascadia Code",monospace;
+    --max-width: 1200px;
+  }
+
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ===== Animated Background ===== */
+  .bg-aura {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bg-aura::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(168,85,247,0.03) 0%, transparent 50%);
+    animation: aura-drift 20s ease-in-out infinite;
+  }
+  @keyframes aura-drift {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    33% { transform: translate(2%,-1%) rotate(1deg); }
+    66% { transform: translate(-1%,2%) rotate(-1deg); }
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+
+  /* ===== Navbar ===== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 16px 24px;
+    transition: background var(--transition-base), box-shadow var(--transition-base);
+  }
+  .nav.scrolled {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 1px 0 var(--border-subtle);
+  }
+  .nav-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+    position: relative;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    transition: width var(--transition-base);
+    border-radius: 1px;
+  }
+  .nav-links a:hover,.nav-links a:focus-visible {
+    color: var(--text-primary);
+  }
+  .nav-links a:hover::after,.nav-links a:focus-visible::after {
+    width: 100%;
+  }
+  .nav-links a:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  .nav-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+  }
+  .nav-menu-btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 0;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+  .hero-content {
+    max-width: 720px;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .hero h1 .gradient-text {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 100px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
+  }
+  .btn-primary {
+    background: var(--accent-primary);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+  }
+  .btn-primary:hover {
+    background: #8b5cf6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124,58,237,0.45);
+  }
+  .btn-ghost {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover {
+    border-color: var(--border-glow);
+    background: rgba(124,58,237,0.06);
+    transform: translateY(-2px);
+  }
+
+  /* ===== Section Headers ===== */
+  .section-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-primary);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .section-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ===== Bento Grid Projects ===== */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+  }
+  .bento-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    transition: all var(--transition-base);
+    overflow: hidden;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .bento-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-card);
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+    z-index: 0;
+  }
+  .bento-card:hover::before {
+    opacity: 1;
+  }
+  .bento-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 0 40px var(--accent-glow);
+  }
+  .bento-card > * { position: relative; z-index: 1; }
+  .bento-card.featured {
+    grid-column: span 2;
+  }
+  .bento-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(124,58,237,0.15);
+    color: var(--accent-primary);
+    flex-shrink: 0;
+  }
+  .bento-card-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  .bento-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .bento-card p {
+    color: var(--text-secondary);
+    font-size: 0.925rem;
+    line-height: 1.65;
+    flex: 1;
+  }
+  .bento-card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--accent-primary);
+    font-weight: 500;
+  }
+  .tag.highlight {
+    background: rgba(124,58,237,0.15);
+    border-color: rgba(124,58,237,0.3);
+    color: #6d28d9;
+  }
+  .bento-card-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-secondary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap var(--transition-fast);
+  }
+  .bento-card-link:hover {
+    gap: 8px;
+  }
+
+  /* ===== Skills ===== */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .skill-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
+  }
+  .skill-pill:hover {
+    border-color: var(--border-glow);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .skill-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ===== Contact ===== */
+  .contact-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 30px rgba(0,0,0,0.05);
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .contact-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .contact-card p {
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.04);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all var(--transition-base);
+  }
+  .contact-link:hover {
+    border-color: var(--border-glow);
+    background: rgba(124,58,237,0.08);
+    transform: translateY(-2px);
+  }
+  .contact-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  /* ===== Animations ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    *,*::before,*::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .bento-card.featured {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-menu-btn { display: block; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 16px;
+      right: 16px;
+      background: rgba(248,249,252,0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      gap: 16px;
+    }
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+    .bento-card.featured {
+      grid-column: span 1;
+    }
+    .section { padding: 64px 0; }
+    .contact-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 30px rgba(0,0,0,0.05); padding: 32px 24px; }
+    .hero-actions { flex-direction: column; }
+    .btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-aura"></div>
+<div class="grid-bg"></div>
+
+<!-- Navigation -->
+<nav class="nav" id="navbar" role="navigation" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo" aria-label="回到首页">AI Portfolio</a>
+    <button class="nav-menu-btn" id="menuBtn" aria-label="打开菜单" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+      </svg>
+    </button>
+    <ul class="nav-links" id="navLinks" role="menubar">
+      <li role="none"><a href="#hero" role="menuitem">首页</a></li>
+      <li role="none"><a href="#projects" role="menuitem">作品</a></li>
+      <li role="none"><a href="#skills" role="menuitem">技能</a></li>
+      <li role="none"><a href="#contact" role="menuitem">联系</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero section" id="hero">
+  <div class="container">
+    <div class="hero-content reveal">
+      <div class="hero-badge">
+        <span class="hero-badge-dot" aria-hidden="true"></span>
+        AI Agent 作品集
+      </div>
+      <h1>用 <span class="gradient-text">AI 智能体</span><br>构建未来</h1>
+      <p>这里展示我创建的一系列 AI 智能体项目——从自动化工作流到智能对话助手，每一个都是探索人机协作边界的尝试。</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">
+          浏览作品
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#contact" class="btn btn-ghost">联系我</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Projects -->
+<section class="section" id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">作品展示</div>
+      <h2 class="section-title">AI 智能体项目</h2>
+      <p class="section-subtitle">精选的人工智能与自动化项目，涵盖多个应用场景</p>
+    </div>
+
+    <div class="bento-grid">
+      <!-- Featured Project 1 -->
+      <article class="bento-card featured reveal reveal-delay-1">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            <path d="M8 9h8M8 13h6"/>
+          </svg>
+        </div>
+        <h3>智能客服 Agent</h3>
+        <p>基于大语言模型的多轮对话智能体，支持上下文理解、情感识别和知识库检索，可无缝接入企业微信、钉钉等平台，实现 7×24 小时自动客服。</p>
+        <div class="bento-card-tags">
+          <span class="tag highlight">LLM</span>
+          <span class="tag">RAG</span>
+          <span class="tag">Python</span>
+          <span class="tag">LangChain</span>
+        </div>
+        <a href="customer-service-agent-detail.html" class="bento-card-link">了解详情 →</a>
+      </article>
+
+      <!-- Project 2 -->
+      <article class="bento-card reveal reveal-delay-2">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </div>
+        <h3>自动化工作流引擎</h3>
+        <p>可视化编排 AI 任务流水线，支持多 Agent 协作、条件分支和错误重试，大幅提升复杂业务流程的自动化效率。</p>
+        <div class="bento-card-tags">
+          <span class="tag">Multi-Agent</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">Workflow</span>
+        </div>
+        <a href="#" class="bento-card-link">了解详情 →</a>
+      </article>
+
+      <!-- Project 3 -->
+      <article class="bento-card reveal reveal-delay-3">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <h3>文档智能解析 Agent</h3>
+        <p>自动识别 PDF、Word、扫描件中的结构化信息，结合 OCR 和 NLP 进行关键字段提取、分类与归档。</p>
+        <div class="bento-card-tags">
+          <span class="tag highlight">OCR</span>
+          <span class="tag">NLP</span>
+          <span class="tag">Python</span>
+        </div>
+        <a href="#" class="bento-card-link">了解详情 →</a>
+      </article>
+
+      <!-- Project 4 -->
+      <article class="bento-card reveal reveal-delay-4">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+          </svg>
+        </div>
+        <h3>情感分析与舆情监控</h3>
+        <p>实时抓取社交媒体与评论区数据，通过情感模型分析用户情绪趋势，自动生成预警和洞察报告。</p>
+        <div class="bento-card-tags">
+          <span class="tag">Sentiment</span>
+          <span class="tag">Real-time</span>
+          <span class="tag">Dashboard</span>
+        </div>
+        <a href="#" class="bento-card-link">了解详情 →</a>
+      </article>
+
+      <!-- Project 5 -->
+      <article class="bento-card reveal reveal-delay-5">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20V10M18 20V4M6 20v-4"/>
+          </svg>
+        </div>
+        <h3>数据分析 Copilot</h3>
+        <p>自然语言驱动的数据查询与分析助手，支持 SQL 生成、可视化图表输出和洞察摘要，让非技术人员也能轻松驾驭数据。</p>
+        <div class="bento-card-tags">
+          <span class="tag highlight">Text-to-SQL</span>
+          <span class="tag">Chart</span>
+          <span class="tag">Copilot</span>
+        </div>
+        <a href="#" class="bento-card-link">了解详情 →</a>
+      </article>
+
+      <!-- Featured Project 6 -->
+      <article class="bento-card featured reveal reveal-delay-3">
+        <div class="bento-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3>代码审查 AI Agent</h3>
+        <p>自动分析 Pull Request 中的代码变更，基于最佳实践和项目规范提供智能审查建议，覆盖安全性、性能、可维护性等多个维度，大幅提升 Code Review 效率。</p>
+        <div class="bento-card-tags">
+          <span class="tag highlight">Code Review</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">AST</span>
+          <span class="tag">CI/CD</span>
+        </div>
+        <a href="#" class="bento-card-link">了解详情 →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Skills -->
+<section class="section" id="skills">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">技术能力</div>
+      <h2 class="section-title">技能与工具</h2>
+      <p class="section-subtitle">驱动 AI 智能体背后的技术栈</p>
+    </div>
+    <div class="skills-grid reveal reveal-delay-1">
+      <div class="skill-pill"><span class="skill-dot" style="background:#7c3aed" aria-hidden="true"></span> Python</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#06b6d4" aria-hidden="true"></span> TypeScript</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#f59e0b" aria-hidden="true"></span> LangChain</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#22c55e" aria-hidden="true"></span> OpenAI API</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#ef4444" aria-hidden="true"></span> FastAPI</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#8b5cf6" aria-hidden="true"></span> Node.js</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#ec4899" aria-hidden="true"></span> RAG</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#14b8a6" aria-hidden="true"></span> Docker</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#6366f1" aria-hidden="true"></span> Vector DB</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#f97316" aria-hidden="true"></span> Prompt Eng.</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#3b82f6" aria-hidden="true"></span> React/Next.js</div>
+      <div class="skill-pill"><span class="skill-dot" style="background:#a855f7" aria-hidden="true"></span> Multi-Agent</div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="contact-card reveal">
+      <h3>一起探索 AI 的可能</h3>
+      <p>如果你对 AI 智能体感兴趣，或者有合作想法，欢迎联系我</p>
+      <div class="contact-links">
+        <a href="mailto:hello@example.com" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Email
+        </a>
+        <a href="https://github.com" class="contact-link" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 AI Agent Portfolio. Built with passion for intelligent automation.</p>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 20);
+  });
+
+  // Mobile menu
+  const menuBtn = document.getElementById("menuBtn");
+  const navLinks = document.getElementById("navLinks");
+  menuBtn.addEventListener("click", () => {
+    const open = navLinks.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open);
+  });
+  navLinks.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+      menuBtn.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

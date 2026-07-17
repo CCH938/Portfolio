@@ -1,0 +1,753 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能客服 Agent · 项目详情</title>
+<style>
+  /* ===== CSS Variables (matching portfolio) ===== */
+  :root {
+    --bg-deep: #ffffff;
+    --bg-surface: #f8f9fc;
+    --bg-card: #ffffff;
+    --border-subtle: rgba(0,0,0,0.08);
+    --border-glow: rgba(124,58,237,0.25);
+    --text-primary: #1a1a2e;
+    --text-secondary: #5c5c7a;
+    --text-muted: #8e8ea8;
+    --accent-primary: #7c3aed;
+    --accent-secondary: #06b6d4;
+    --accent-glow: rgba(124,58,237,0.08);
+    --gradient-hero: linear-gradient(135deg, #7c3aed 0%, #06b6d4 50%, #a855f7 100%);
+    --gradient-card: linear-gradient(135deg, rgba(124,58,237,0.04), rgba(6,182,212,0.04));
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    --font-mono: "SF Mono","Fira Code","Cascadia Code",monospace;
+    --max-width: 1100px;
+  }
+
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== Animated Background ===== */
+  .bg-aura {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-aura::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(168,85,247,0.03) 0%, transparent 50%);
+    animation: aura-drift 20s ease-in-out infinite;
+  }
+  @keyframes aura-drift {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    33% { transform: translate(2%,-1%) rotate(1deg); }
+    66% { transform: translate(-1%,2%) rotate(-1deg); }
+  }
+
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .top-nav-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+  }
+  .back-link:hover {
+    color: var(--accent-primary);
+    background: rgba(124,58,237,0.06);
+  }
+  .back-link svg {
+    width: 18px; height: 18px;
+  }
+  .nav-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-spacer { width: 80px; }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: 60px 0 40px;
+    text-align: center;
+  }
+  .hero-icon {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 40px rgba(124,58,237,0.25);
+  }
+  .hero-icon svg {
+    width: 40px; height: 40px;
+    color: #fff;
+  }
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero .subtitle {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 650px;
+    margin: 0 auto 24px;
+    line-height: 1.7;
+  }
+  .hero-badges {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-badge {
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.15);
+  }
+  .hero-badge.accent2 {
+    color: var(--accent-secondary);
+    background: rgba(6,182,212,0.08);
+    border-color: rgba(6,182,212,0.15);
+  }
+
+  /* ===== Section ===== */
+  .section {
+    padding: 48px 0;
+  }
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::before {
+    content: "";
+    width: 4px;
+    height: 28px;
+    background: var(--gradient-hero);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ===== Cards ===== */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h3 .card-icon {
+    font-size: 1.4rem;
+  }
+  .card p {
+    color: var(--text-secondary);
+    font-size: 0.925rem;
+    line-height: 1.65;
+  }
+
+  /* ===== Architecture Diagram ===== */
+  .arch-diagram {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    overflow-x: auto;
+  }
+  .arch-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .arch-layer {
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .arch-layer.gateway {
+    background: rgba(6,182,212,0.06);
+    border: 1px solid rgba(6,182,212,0.15);
+  }
+  .arch-layer.core {
+    background: rgba(124,58,237,0.06);
+    border: 1px solid rgba(124,58,237,0.15);
+  }
+  .arch-layer.data {
+    background: rgba(168,85,247,0.06);
+    border: 1px solid rgba(168,85,247,0.15);
+  }
+  .arch-layer-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    color: var(--text-muted);
+  }
+  .arch-blocks {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .arch-block {
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+  .arch-arrow {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    padding: 4px 0;
+  }
+
+  /* ===== Metrics Table ===== */
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .metrics-table th {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-subtle);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .metrics-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+  .metrics-table .metric-value {
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-family: var(--font-mono);
+  }
+
+  /* ===== Roadmap ===== */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .roadmap-phase {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .roadmap-phase:last-child {
+    border-bottom: none;
+  }
+  .phase-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 60px;
+  }
+  .phase-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .phase-dot.done { background: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.3); }
+  .phase-dot.current { background: #f59e0b; box-shadow: 0 0 12px rgba(245,158,11,0.3); }
+  .phase-dot.future { background: #d1d5db; }
+  .phase-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .phase-content h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .phase-content ul {
+    list-style: none;
+    padding: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+  .phase-content ul li::before {
+    content: "—";
+    color: var(--text-muted);
+    margin-right: 8px;
+  }
+
+  /* ===== Code Block ===== */
+  .code-block {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    padding: 24px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-top: 12px;
+  }
+  .code-block .cmd { color: #06b6d4; }
+  .code-block .comment { color: #6b7280; }
+
+  /* ===== Tags ===== */
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 0.8rem;
+    padding: 5px 14px;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--accent-primary);
+    font-weight: 500;
+  }
+
+  /* ===== Footer ===== */
+  .detail-footer {
+    text-align: center;
+    padding: 48px 24px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+  .detail-footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+  }
+  .detail-footer a:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== Reveal Animations ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .arch-blocks { flex-direction: column; align-items: center; }
+    .roadmap-phase { flex-direction: column; gap: 8px; }
+    .phase-marker { flex-direction: row; width: auto; gap: 8px; align-items: center; }
+    .nav-spacer { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bg-aura::before { animation: none; }
+    .reveal { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-aura" aria-hidden="true"></div>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <div class="top-nav-inner">
+    <a href="index.html" class="back-link" aria-label="返回作品集首页">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      返回作品集
+    </a>
+    <span class="nav-title">智能客服 Agent</span>
+    <span class="nav-spacer"></span>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero container reveal">
+  <div class="hero-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+      <line x1="9" y1="9" x2="9.01" y2="9"/>
+      <line x1="15" y1="9" x2="15.01" y2="9"/>
+    </svg>
+  </div>
+  <h1>智能客服 Agent</h1>
+  <p class="subtitle">基于大语言模型的多轮对话智能客服系统，集成 RAG 知识库检索、意图识别与情感分析，支持企业微信、钉钉等多平台接入，实现 7×24 小时自动客服。</p>
+  <div class="hero-badges">
+    <span class="hero-badge">LLM 驱动</span>
+    <span class="hero-badge accent2">RAG 检索</span>
+    <span class="hero-badge">多平台接入</span>
+    <span class="hero-badge accent2">7×24 在线</span>
+  </div>
+</section>
+
+<!-- Product Overview -->
+<section class="section container">
+  <h2 class="section-title reveal">产品概述</h2>
+  <div class="card reveal">
+    <p style="max-width:900px">本系统是一套面向企业级场景的智能客服解决方案。以 DeepSeek / GPT-4o-mini 等大语言模型为核心引擎，结合向量检索（RAG）实现精准知识问答，辅以意图识别和情感分析模块，能够理解用户真实意图、感知情绪变化，提供自然流畅的多轮对话体验。</p>
+    <br>
+    <p style="max-width:900px;color:var(--text-secondary)">适用场景涵盖：售后咨询（退换货、物流、保修）、产品使用指导、业务办理引导、内部 IT 服务台等。通过统一的 Message Router 可无缝接入企业微信、钉钉、Web Chat 等渠道。</p>
+  </div>
+</section>
+
+<!-- Core Metrics -->
+<section class="section container">
+  <h2 class="section-title reveal">核心指标</h2>
+  <div class="card reveal" style="overflow-x:auto">
+    <table class="metrics-table">
+      <thead>
+        <tr><th>指标</th><th>目标值</th><th>衡量方式</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>首响时间</td><td><span class="metric-value">&lt; 3s</span></td><td>P95 延迟监控（含 RAG 检索）</td></tr>
+        <tr><td>意图识别准确率</td><td><span class="metric-value">≥ 92%</span></td><td>人工抽检 + 用户反馈</td></tr>
+        <tr><td>知识库问答命中率</td><td><span class="metric-value">≥ 85%</span></td><td>检索召回率 + 答案采纳率</td></tr>
+        <tr><td>人工转接率</td><td><span class="metric-value">≤ 15%</span></td><td>客服系统统计</td></tr>
+        <tr><td>并发支持</td><td><span class="metric-value">500 QPS</span></td><td>压力测试验证</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- System Architecture -->
+<section class="section container">
+  <h2 class="section-title reveal">系统架构</h2>
+  <div class="arch-diagram reveal">
+    <div class="arch-layers">
+      <!-- Gateway Layer -->
+      <div class="arch-layer gateway">
+        <div class="arch-layer-title">接入层 · Gateway</div>
+        <div class="arch-blocks">
+          <span class="arch-block">企业微信</span>
+          <span class="arch-block">钉钉</span>
+          <span class="arch-block">Web Chat</span>
+          <span class="arch-block">API / SDK</span>
+        </div>
+      </div>
+      <div class="arch-arrow">▼ Message Router · 消息统一路由 ▼</div>
+      <!-- Core Layer -->
+      <div class="arch-layer core">
+        <div class="arch-layer-title">核心服务层 · Agent Orchestrator</div>
+        <div class="arch-blocks">
+          <span class="arch-block">🤖 意图识别</span>
+          <span class="arch-block">💬 对话管理</span>
+          <span class="arch-block">📚 知识检索 RAG</span>
+          <span class="arch-block">❤️ 情感分析</span>
+          <span class="arch-block">🛡️ 安全护栏</span>
+        </div>
+      </div>
+      <div class="arch-arrow">▼ LLM Gateway · 模型统一调用层 ▼</div>
+      <!-- Data Layer -->
+      <div class="arch-layer data">
+        <div class="arch-layer-title">数据与基础设施层</div>
+        <div class="arch-blocks">
+          <span class="arch-block">PostgreSQL</span>
+          <span class="arch-block">Redis</span>
+          <span class="arch-block">Milvus 向量库</span>
+          <span class="arch-block">Docker / K8s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Capabilities -->
+<section class="section container">
+  <h2 class="section-title reveal">核心能力</h2>
+  <div class="card-grid">
+    <div class="card reveal">
+      <h3><span class="card-icon">🧠</span> 意图识别引擎</h3>
+      <p>基于 LLM 的 Few-shot 意图分类，支持 20+ 业务意图的精准识别。结合置信度阈值与降级策略，低置信度场景自动转人工或引导用户澄清，保障对话质量。</p>
+    </div>
+    <div class="card reveal">
+      <h3><span class="card-icon">📚</span> RAG 知识检索</h3>
+      <p>Embedding + 向量相似度搜索，从 FAQ / 产品手册中精准召回相关知识片段，与 LLM 生成结合输出有据可依的答案。支持关键词 + 语义双路召回，提升命中率。</p>
+    </div>
+    <div class="card reveal">
+      <h3><span class="card-icon">💬</span> 多轮对话记忆</h3>
+      <p>会话级上下文管理，基于 TTL 的滑动窗口记忆机制。自动维护最近的 N 轮对话历史，支持跨轮指代消解和上下文连贯回复。</p>
+    </div>
+    <div class="card reveal">
+      <h3><span class="card-icon">❤️</span> 情感分析</h3>
+      <p>实时识别用户情绪（正面 / 中性 / 负面），当检测到强烈不满或投诉倾向时，自动触发安抚策略并优先转接人工坐席，避免舆情升级。</p>
+    </div>
+    <div class="card reveal">
+      <h3><span class="card-icon">🛡️</span> 安全护栏</h3>
+      <p>多层安全防护：Prompt 注入检测、PII 敏感信息脱敏、输出内容过滤、敏感词拦截。确保系统不被恶意利用，保障用户隐私与合规性。</p>
+    </div>
+    <div class="card reveal">
+      <h3><span class="card-icon">🔌</span> 多平台接入</h3>
+      <p>统一的 Message Router 抽象层，通过 Adapter 模式接入企业微信、钉钉、Web Chat、API 等多种渠道。消息格式统一转换，业务逻辑零耦合。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="section container">
+  <h2 class="section-title reveal">技术栈</h2>
+  <div class="card reveal">
+    <div class="tags" style="margin-bottom:20px">
+      <span class="tag">Python 3.10+</span>
+      <span class="tag">FastAPI / aiohttp</span>
+      <span class="tag">LangChain</span>
+      <span class="tag">DeepSeek / GPT-4o-mini</span>
+      <span class="tag">PostgreSQL</span>
+      <span class="tag">Redis</span>
+      <span class="tag">Milvus</span>
+      <span class="tag">Docker</span>
+      <span class="tag">Kubernetes</span>
+      <span class="tag">Pydantic</span>
+      <span class="tag">Sentence-Transformers</span>
+      <span class="tag">Prometheus + Grafana</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:0.9rem">LLM 网关支持 OpenAI 兼容 API，可灵活切换 DeepSeek / GPT-4o-mini / 本地模型。知识库 Embedding 采用 Sentence-Transformers，向量检索基于 Milvus。会话状态与缓存通过 Redis 管理，持久化数据存储于 PostgreSQL。</p>
+  </div>
+</section>
+
+<!-- Development Roadmap -->
+<section class="section container">
+  <h2 class="section-title reveal">开发路线</h2>
+  <div class="card reveal">
+    <div class="roadmap">
+      <div class="roadmap-phase">
+        <div class="phase-marker">
+          <span class="phase-dot done"></span>
+          <span class="phase-label">Phase 1</span>
+        </div>
+        <div class="phase-content">
+          <h4>基础搭建 · 2 周 ✅</h4>
+          <ul>
+            <li>项目脚手架（FastAPI + Docker）</li>
+            <li>LLM 接入层（GPT-4o-mini）</li>
+            <li>基础对话 API（/chat/send）</li>
+            <li>PostgreSQL 建表 + 会话存储</li>
+            <li>简单 FAQ 知识库（8 条）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-marker">
+          <span class="phase-dot current"></span>
+          <span class="phase-label">Phase 2</span>
+        </div>
+        <div class="phase-content">
+          <h4>核心能力 · 3 周 🔄</h4>
+          <ul>
+            <li>RAG 检索 Pipeline</li>
+            <li>意图识别引擎（20+ 意图）</li>
+            <li>多轮对话记忆管理</li>
+            <li>情感分析模块</li>
+            <li>安全护栏（Guardrails）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-marker">
+          <span class="phase-dot future"></span>
+          <span class="phase-label">Phase 3</span>
+        </div>
+        <div class="phase-content">
+          <h4>平台接入 · 2 周</h4>
+          <ul>
+            <li>企业微信 Adapter</li>
+            <li>钉钉 Adapter</li>
+            <li>Web Chat 前端</li>
+            <li>消息统一路由</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-marker">
+          <span class="phase-dot future"></span>
+          <span class="phase-label">Phase 4</span>
+        </div>
+        <div class="phase-content">
+          <h4>生产就绪 · 2 周</h4>
+          <ul>
+            <li>K8s 部署 + HPA 自动伸缩</li>
+            <li>Prometheus + Grafana 监控</li>
+            <li>ELK 日志收集</li>
+            <li>压力测试与调优</li>
+            <li>运营后台（知识管理 + 数据看板）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-marker">
+          <span class="phase-dot future"></span>
+          <span class="phase-label">Phase 5</span>
+        </div>
+        <div class="phase-content">
+          <h4>持续优化 · 长期</h4>
+          <ul>
+            <li>A/B 测试不同 Prompt 策略</li>
+            <li>用户反馈闭环（赞/踩 → 自动优化）</li>
+            <li>多语言支持</li>
+            <li>语音消息接入</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section class="section container">
+  <h2 class="section-title reveal">快速启动</h2>
+  <div class="card reveal">
+    <p style="margin-bottom:12px;color:var(--text-secondary)">Phase 1 已完成，可直接运行体验。需要 Python 3.10+ 和 DeepSeek API Key。</p>
+    <div class="code-block">
+<span class="comment"># 1. 进入项目目录</span>
+<span class="cmd">cd</span> customer-service-agent
+
+<span class="comment"># 2. 配置 API Key</span>
+<span class="comment"># 编辑 .env 文件，修改 OPENAI_API_KEY</span>
+
+<span class="comment"># 3. 安装依赖</span>
+<span class="cmd">pip install</span> aiohttp langchain langchain-openai langchain-core pydantic pydantic-settings httpx python-dotenv tenacity
+
+<span class="comment"># 4. 启动服务</span>
+<span class="cmd">python -m</span> app.main
+
+<span class="comment"># 5. 打开浏览器访问</span>
+<span class="comment"># http://localhost:8000 → 网页聊天界面</span>
+    </div>
+    <br>
+    <p style="color:var(--text-muted);font-size:0.85rem">📁 项目结构：app/api/（路由）、app/core/（LLM / 记忆 / 护栏 / 知识库）、app/models/（数据模型）、static/（Web 界面）、knowledge/（FAQ 文件）</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="detail-footer container">
+  <p>&copy; 2026 AI Agent Portfolio · <a href="index.html">返回作品集首页</a></p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -30px 0px" });
+
+  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
